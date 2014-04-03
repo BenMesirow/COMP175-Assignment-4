@@ -16,6 +16,14 @@ using namespace std;
 
 /** These are the live variables passed into GLUI ***/
 int  isectOnly = 1;
+int staticID;
+struct sceneElement{
+	Matrix  t;
+	int*    s;
+	SceneMaterial* m;
+};
+
+sceneElement* sceneData = NULL;
 
 int	 camRotU = 0;
 int	 camRotV = 0;
@@ -43,6 +51,7 @@ Cone* cone = new Cone();
 Sphere* sphere = new Sphere();
 SceneParser* parser = NULL;
 Camera* camera = new Camera();
+
 
 void setupCamera();
 void updateCamera();
@@ -74,21 +83,81 @@ void callback_start(int id) {
 
 	cout << "(w, h): " << pixelWidth << ", " << pixelHeight << endl;
 
+	Point eyePoint = Point(eyeX, eyeY, eyeZ);
+	SceneGlobalData global;
+	parser->getGlobalData(global);
+
+	float ka = global.ka;
+	float kd = global.kd;
+	int nLights = parser->getNumLights();
+
+	int half_width = pixelWidth / 2;
+	int half_height = pixelHeight / 2;
+
+	Vector look = camera->GetLookVector();
+
 	for (int i = 0; i < pixelWidth; i++) {
+		float angleX = viewAngle * (i - half_width) / half_width;
+		Matrix Mrotx = rotX_mat(DEG_TO_RAD(angleX));
 		for (int j = 0; j < pixelHeight; j++) {
-			//replace the following code
+
+			float angleY = viewAngle * (half_height - j) / half_height;
+			Vector d = rotY_mat(DEG_TO_RAD(angleY)) * Mrotx * look;
+
 			if ((i % 5 == 0) && (j % 5 == 0)) {
-				setPixel(pixels, i, j, 255, 0, 0);
+				if (isectOnly)
+					setPixel(pixels, i, j, 255, 255, 255);
+				else
+					//test to see if angleX is correct;
+					//setPixel(pixels, i, j, 255, 255 * abs(angleX) / viewAngle, 0);
+					//test to see if angleY is correct;
+					//setPixel(pixels, i, j, 255, 0, 255 * abs(angleY) / viewAngle);
+					setPixel(pixels, i, j, 255, 255 * abs((int)angleX) / viewAngle, 255 * abs((int)angleY) / viewAngle);
 			}
+
 			else {
-				setPixel(pixels, i, j, 128, 128, 128);
+				setPixel(pixels, i, j, 0, 0, 0);
 			}
 		}
 	}
 	glutPostRedisplay();
 }
 
+void parseAndFill(SceneNode *node, Matrix& fromP, sceneElement* sceneData) {
+	if (node != NULL) {
+		Matrix T = fromP;
+		for (int i = 0; i < node->transformations.size(); i++) {
+			switch(node->transformations[i]->type) {
+				case TRANSFORMATION_TRANSLATE:
+					T = T * trans_mat(node->transformations[i]->translate);
+					break;
+				case TRANSFORMATION_SCALE:
+					T = T * scale_mat(node->transformations[i]->scale);
+					break;
+				case TRANSFORMATION_ROTATE:
+					T = T * rot_mat(node->transformations[i]->rotate, node->transformations[i]->angle);
+					break;
+				case TRANSFORMATION_MATRIX:
+					T = T * node->transformations[i]->matrix;
+					break;
+			}
+		}
 
+		sceneData[staticID].t = T; 
+
+
+		(sceneData[staticID].s)[0] = node->primitives.size();
+		for (int i = 0; i < node->primitives.size(); i++) {
+				(sceneData[staticID].s)[i+1] = node->primitives[i]->type;
+				(sceneData[staticID].m)[i]   = node->primitives[i]->material;
+		}
+
+		for (int i = 0; i < node->children.size(); i++) {
+			staticID++;
+			parseAndFill(node->children[i], T, sceneData);
+		}
+	}
+}
 
 void callback_load(int id) {
 	char curDirName [2048];
@@ -101,11 +170,22 @@ void callback_load(int id) {
 		delete parser;
 	}
 	parser = new SceneParser (filenamePath);
+	SceneNode*     root = parser->getRootNode();
 	cout << "success? " << parser->parse() << endl;
+
+	sceneData = new sceneElement[1000];
+
+	for(int i =0; i < 1000; i++){
+		sceneData[i].s = new int[100];
+		sceneData[i].m = new SceneMaterial[100];
+	}
+
+	Matrix I = Matrix();
+	staticID = 0;
+	parseAndFill(root, I, sceneData);
 
 	setupCamera();
 }
-
 
 /***************************************** myGlutIdle() ***********/
 
@@ -188,11 +268,7 @@ void myGlutDisplay(void)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (parser == NULL) {
-		return;
-	}
-
-	if (pixels == NULL) {
+	if (parser == NULL || pixels == NULL) {
 		return;
 	}
 

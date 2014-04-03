@@ -45,12 +45,16 @@ void Cone::draw() {
 
             glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerXL,lowerY,lowerZL);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperXL,lowerY,upperZL);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerXU,upperY,lowerZU);
 
             glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerXU,upperY,lowerZU);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperXL,lowerY,upperZL);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperXU,upperY,upperZU);
         }
     }
@@ -109,4 +113,11 @@ void Cone::drawNormal()  {
         }
     }
     glEnd();
+}
+
+double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+    return 0;
+}
+Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist) {
+    return Vector();
 }

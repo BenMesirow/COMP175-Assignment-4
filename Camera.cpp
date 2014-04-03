@@ -5,19 +5,19 @@
 
 
 Camera::Camera() {
+    view = 60;
     near = 0.001;
     far = 30.0;
-    view = 45;
-    Orient(Point(2.0, 2.0, 2.0), Vector(-2.0, -2.0, -2.0), Vector(0, 1, 0));
+    Orient( Point(0,0,1), Vector(0,0,-1), Vector(0,1,0) );
 }
 
 Camera::~Camera() {}
 
 void Camera::Reset() {
+    view = 60;
     near = 0.001;
     far = 30.0;
-    view = 45;
-    Orient(Point(2.0, 2.0, 2.0), Vector(-2.0, -2.0, -2.0), Vector(0, 1, 0));
+    Orient( Point(0,0,1), Vector(0,0,-1), Vector(0,1,0) );
 }
 
 void Camera::Orient(Point eye, Point focus, Vector up) {
@@ -28,7 +28,7 @@ void Camera::Orient(Point eye, Point focus, Vector up) {
 
     w = Vector(look);
     w.negate();
-    //w.normalize();
+    w.normalize();
     u = cross(up, w);
     u.normalize();
     v = cross(w, u);
@@ -43,7 +43,7 @@ void Camera::Orient(Point eye, Vector look, Vector up) {
 
     w = Vector(look);
     w.negate();
-    //w.normalize();
+    w.normalize();
     u = cross(up, w);
     u.normalize();
     v = cross(w, u);
@@ -67,10 +67,9 @@ Matrix Camera::GetProjectionMatrix() {
 void Camera::SetViewAngle (double viewAngle) { view = viewAngle; }
 void Camera::SetNearPlane (double nearPlane) { near = nearPlane; }
 void Camera::SetFarPlane (double farPlane) { far = farPlane; }
-
 void Camera::SetScreenSize (int screenWidth, int screenHeight) {
-width = screenWidth;
-height = screenHeight;
+    width = screenWidth;
+    height = screenHeight;
 }
 
 Matrix Camera::GetModelViewMatrix() {

@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-stdlib=libstdc++ -Wno-deprecated
 LDLIBS=-I/Library/Frameworks/GLUI.framework/Headers -framework OpenGL -framework GLUI -framework GLUT
-SHAPES=Shape.cpp Cone.cpp Cube.cpp Cylinder.cpp Sphere.cpp Torus.cpp
+SHAPES=Shape.cpp Cone.cpp Cube.cpp Cylinder.cpp Sphere.cpp
 EXE=a4
 
 $(EXE): *.cpp

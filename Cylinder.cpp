@@ -17,7 +17,9 @@ void Cylinder::draw() {
             /* bottom base */
         glNormal3f(0, -1, 0);
         glVertex3f(0.0, -0.5, 0.0);
+        glNormal3f(0, -1, 0);
         glVertex3f(upperX,-0.5,upperZ);
+        glNormal3f(0, -1, 0);
         glVertex3f(lowerX,-0.5,lowerZ);
 
         for (float y = 0.0; y < m_segmentsY; ++y) {
@@ -30,19 +32,25 @@ void Cylinder::draw() {
 
             glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerX,lowerY,lowerZ);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperX,lowerY,upperZ);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerX,upperY,lowerZ);
 
             glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(lowerX,upperY,lowerZ);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperX,lowerY,upperZ);
+            glNormal3f(norm[0],norm[1],norm[2]);
             glVertex3f(upperX,upperY,upperZ);
         }           
 
             /* top base */
         glNormal3f(0, 1, 0);
         glVertex3f(0.0, 0.5, 0.0);
+        glNormal3f(0, 1, 0);
         glVertex3f(lowerX,0.5,lowerZ);
+        glNormal3f(0, 1, 0);
         glVertex3f(upperX,0.5,upperZ);
     }
     glEnd();
@@ -90,4 +98,11 @@ void Cylinder::drawNormal()  {
         glVertex3f(upperX,0.5,upperZ);
     }
     glEnd();
+}
+
+double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+    return 0;
+}
+Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist) {
+    return Vector();
 }
